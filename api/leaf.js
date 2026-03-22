@@ -1,37 +1,53 @@
-// api/leaf.js
-import fs from "fs";
-import path from "path";
 import formidable from "formidable";
+import fs from "fs";
+import FormData from "form-data";
+import fetch from "node-fetch";
 
 export const config = {
-  api: { bodyParser: false }
+  api: { bodyParser: false },
 };
 
+// 👉 PUT YOUR RENDER URL HERE
+const ML_API_URL = "https://your-fastapi.onrender.com/api/leaf";
+
 export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const form = new formidable.IncomingForm();
-    form.uploadDir = "/tmp"; // Vercel temporary folder
-    form.keepExtensions = true;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
 
-    form.parse(req, (err, fields, files) => {
-      if (err) return res.status(500).json({ error: err.message });
+  const form = new formidable.IncomingForm();
+  form.uploadDir = "/tmp";
+  form.keepExtensions = true;
 
-      const label = fields.label || "Unknown";
-      const confidence = fields.confidence || "0";
-      const imageFile = files.image;
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
 
-      // Save image temporarily (optional)
-      if (imageFile) {
-        const oldPath = imageFile.filepath;
-        const newPath = path.join("/tmp", imageFile.originalFilename);
-        fs.renameSync(oldPath, newPath);
+    try {
+      const file = files.file;
+
+      if (!file) {
+        return res.status(400).json({ error: "No file uploaded" });
       }
 
-      console.log("Received leaf detection:", label, confidence);
+      const fileStream = fs.createReadStream(file.filepath);
 
-      res.status(200).json({ message: "Leaf data received", label, confidence });
-    });
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
-  }
+      const formData = new FormData();
+      formData.append("file", fileStream, file.originalFilename);
+
+      const response = await fetch(ML_API_URL, {
+        method: "POST",
+        body: formData,
+        headers: formData.getHeaders(),
+      });
+
+      const result = await response.json();
+
+      return res.status(200).json(result);
+
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  });
 }
