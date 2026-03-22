@@ -7,7 +7,7 @@ export const config = {
   api: { bodyParser: false },
 };
 
-// 👉 PUT YOUR RENDER URL HERE
+// 👉 PUT YOUR FASTAPI URL HERE
 const ML_API_URL = "https://your-fastapi.onrender.com/api/leaf";
 
 export default async function handler(req, res) {
