@@ -1,0 +1,12 @@
+{
+  "name": "leaf-backend",
+  "version": "1.0.0",
+  "description": "Backend for leaf disease detection from Raspberry Pi",
+  "main": "index.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "formidable": "^3.7.1"
+  }
+}
