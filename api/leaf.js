@@ -8,7 +8,7 @@ export const config = {
 };
 
 // 👉 PUT YOUR FASTAPI URL HERE
-const ML_API_URL = "https://unsuperior-bizarrely-rodrigo.ngrok-free.dev/api/leaf";
+const ML_API_URL = "https://d433-34-138-204-91.ngrok-free.app/api/leaf";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
